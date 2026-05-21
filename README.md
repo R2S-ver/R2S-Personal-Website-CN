@@ -1,3 +1,11 @@
-# R2S-Personal-Website-CN
+<div align="center">
+  
+# R2S-Personal-Website
+My personal website hosted here
 
-我的个人网站
+---
+
+# [**→Website←**](https://r2s-ver.github.io/R2S-Personal-Website/) <br>
+# [**Test run before pushing**](https://www.runoob.com/runcode)  <br>
+
+</div>
