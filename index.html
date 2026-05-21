@@ -1,1 +1,1772 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-immersive-translate-page-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>R2S | 个人站点 v5.5</title>
 
+    <link rel="icon" href="./favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="./favicon-48x48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="./android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="./android-chrome-512x512.png" sizes="512x512">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <link rel="mask-icon" href="./safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="./site.webmanifest">
+
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050506;
+            --panel: #0c0c0e;
+            --accent: #ff5f1f;
+            --terminal-green: #00ff41;
+            --text: #ffffff;
+            --text-bright: #ffffff;
+            --border: #25252a;
+            --stripe-red: #e53935;
+            --stripe-yellow: #ffb300;
+            --stripe-teal: #00b0ff;
+            --font-main: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 60%, rgba(0, 0, 0, 0.4) 40%);
+            z-index: 9999;
+            background-size: 100% 4px;
+            pointer-events: none;
+            box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.9);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    transparent 0%,
+                    rgba(0, 0, 0, 0.35) 15%,
+                    rgba(0, 0, 0, 0.5) 20%,
+                    rgba(0, 0, 0, 0.35) 25%,
+                    transparent 40%,
+                    transparent 60%,
+                    rgba(0, 0, 0, 0.35) 75%,
+                    rgba(0, 0, 0, 0.5) 80%,
+                    rgba(0, 0, 0, 0.35) 85%,
+                    transparent 100%);
+            background-size: 100% 200%;
+            z-index: 9998;
+            pointer-events: none;
+            animation: pwm-scroll 15s linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes pwm-scroll {
+            0% {
+                background-position: 0 0%;
+            }
+            100% {
+                background-position: 0 -200%;
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -2;
+            opacity: 0.25;
+        }
+
+        .cinematic-bars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(0, 0, 0, 0.9) 0%,
+                    rgba(0, 0, 0, 0.6) 8%,
+                    transparent 20%,
+                    transparent 80%,
+                    rgba(0, 0, 0, 0.6) 92%,
+                    rgba(0, 0, 0, 0.9) 100%);
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        @media (max-width: 900px) {
+            .cinematic-bars {
+                background: linear-gradient(to bottom,
+                        rgba(0, 0, 0, 0.8) 0%,
+                        transparent 10%,
+                        transparent 90%,
+                        rgba(0, 0, 0, 0.8) 100%);
+            }
+        }
+
+        #neural-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            position: relative;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nasa-tape {
+            height: 14px;
+            width: 100%;
+            background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 15px, #000 15px, #000 30px);
+            border-top: 1px solid var(--accent);
+            border-bottom: 1px solid var(--accent);
+        }
+
+        .chamfer-box {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            position: relative;
+        }
+
+        .chamfer-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--accent);
+            z-index: -1;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        }
+
+        .barcode {
+            display: inline-block;
+            height: 35px;
+            width: 130px;
+            background: repeating-linear-gradient(90deg, #fff, #fff 2px, transparent 2px, transparent 4px, #fff 4px, #fff 5px, transparent 5px, transparent 8px);
+        }
+
+        .tri-color-bar {
+            display: flex;
+            height: 100%;
+            width: 10px;
+            flex-direction: column;
+        }
+        .tri-color-row {
+            display: flex;
+            height: 6px;
+            width: 100%;
+        }
+        .s-red {
+            background: var(--stripe-red);
+            flex: 1;
+        }
+        .s-yellow {
+            background: var(--stripe-yellow);
+            flex: 1;
+        }
+        .s-teal {
+            background: var(--stripe-teal);
+            flex: 1;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            background: #050506;
+        }
+        .nav-inner {
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 60px;
+            padding-top: 50px;
+        }
+        .hero-title-wrapper {
+            display: flex;
+            gap: 25px;
+            align-items: stretch;
+        }
+        .hero h1 {
+            font-size: clamp(4rem, 9vw, 8rem);
+            text-transform: uppercase;
+            line-height: 0.85;
+            font-weight: 900;
+            letter-spacing: -2px;
+            color: #fff;
+        }
+
+        .hero-data-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            border: 1px solid var(--accent);
+            padding: 4px 10px;
+            display: inline-block;
+            margin-bottom: 15px;
+            background: #000;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .terminal-window {
+            width: 450px;
+            height: 280px;
+            background: #000;
+            padding: 2px;
+            box-shadow: 15px 15px 0px rgba(255, 95, 31, 0.15);
+        }
+        .terminal-inner {
+            background: #050506;
+            height: 100%;
+            padding: 25px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--terminal-green);
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+            border: 1px solid #1a1a20;
+        }
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: var(--terminal-green);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: -80px;
+            margin-bottom: 100px;
+            position: relative;
+            z-index: 10;
+        }
+        .nav-card {
+            padding: 40px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 18px;
+            text-transform: uppercase;
+            transition: all 0.2s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-top: 3px solid transparent;
+            font-weight: bold;
+        }
+        .nav-card span:first-child {
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 42px;
+            line-height: 1;
+        }
+        .nav-card span:nth-child(2) {
+            color: #ffffff;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+        .nav-card:hover {
+            border-top: 3px solid var(--accent);
+            background: #141418;
+            transform: translateY(-4px);
+        }
+
+        .dossier-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: start;
+        }
+        .tech-box {
+            padding: 40px;
+            position: relative;
+            border-left: 4px solid var(--accent);
+            background: var(--panel);
+        }
+        .tech-box::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            border-top: 2px solid var(--border);
+            border-right: 2px solid var(--border);
+        }
+
+        .tech-box h4 {
+            font-size: 13px;
+            font-family: var(--font-mono);
+            color: var(--accent);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        .tech-box h4 span.sec-tag {
+            color: #ffffff !important;
+            background: #222;
+            padding: 2px 8px;
+        }
+
+        .software-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #16161c;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            margin: 0 8px 8px 0;
+            border: 1px solid var(--border);
+            color: #ffffff;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .radar-wrapper {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            padding: 25px;
+            border: 1px solid var(--border);
+        }
+        .radar {
+            width: 190px;
+            height: 190px;
+            border-radius: 0;
+            border: 2px solid var(--accent);
+            position: relative;
+            background: radial-gradient(circle at center, rgba(255, 95, 31, 0.2) 0%, rgba(255, 95, 31, 0.45) 80%);
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(255, 95, 31, 0.3);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            -webkit-mask: radial-gradient(circle at center, black 35%, transparent 80%);
+            mask: radial-gradient(circle at center, black 35%, transparent 80%);
+        }
+        .radar-x,
+        .radar-y {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.35);
+            z-index: 2;
+            pointer-events: none;
+        }
+        .radar-x {
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            transform: translateY(-50%);
+        }
+        .radar-y {
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+            transform: translateX(-50%);
+        }
+        .radar-sweep {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg,
+                    transparent 0deg,
+                    rgba(255, 255, 255, 0.45) 8deg,
+                    rgba(255, 255, 255, 0.1) 16deg,
+                    transparent 32deg);
+            border-radius: 0;
+            z-index: 1;
+            pointer-events: none;
+            will-change: transform;
+        }
+        .radar-blip {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: var(--terminal-green);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--terminal-green);
+            z-index: 3;
+            pointer-events: none;
+            transition: opacity 0.08s ease, box-shadow 0.08s ease;
+        }
+
+        .project-detailed {
+            padding: 50px;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        .project-detailed .nasa-tape {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: minmax(300px, 512px) 1fr;
+            gap: 20px;
+            margin-top: 35px;
+        }
+        .sub-images {
+            display: grid;
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%) contrast(110%);
+            border: 1px solid var(--border);
+            max-height: 220px;
+        }
+        .img-frame {
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+            border: 1px solid var(--border);
+            background: transparent;
+        }
+        .main-gallery-img {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: cover;
+            filter: grayscale(20%) contrast(110%);
+            border: 1px solid var(--border);
+        }
+        .gallery-img:hover,
+        .main-gallery-img:hover {
+            filter: grayscale(0%) contrast(100%);
+            border-color: var(--accent);
+        }
+
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-family: var(--font-mono);
+            font-size: 16px;
+            color: #ffffff;
+        }
+        .materials-table td {
+            padding: 14px 12px;
+            border-bottom: 1px dotted var(--border);
+        }
+        .materials-table td:first-child {
+            color: var(--accent);
+            width: 160px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        footer {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .spec-sheet-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #fff;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 10px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .contact-bright {
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+
+        .iteration-card {
+            background: #0a0a0f;
+            border: 1px solid var(--border);
+            padding: 25px 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .iteration-card:hover {
+            border-color: var(--accent);
+            background: #111118;
+        }
+        .iteration-card .iter-badge {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 10px;
+            display: inline-block;
+            margin-bottom: 14px;
+            letter-spacing: 1.5px;
+        }
+        .iter-badge.v1 {
+            background: var(--stripe-red);
+            color: #000;
+        }
+        .iter-badge.v2 {
+            background: var(--stripe-yellow);
+            color: #000;
+        }
+        .iter-badge.v3 {
+            background: var(--terminal-green);
+            color: #000;
+        }
+        .iteration-card ul {
+            list-style: none;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.9;
+            padding: 0;
+        }
+        .iteration-card ul li::before {
+            content: '▸ ';
+            color: var(--accent);
+        }
+        .tag-label {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 900;
+            padding: 3px 8px;
+            margin-right: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .tag-pro {
+            background: var(--terminal-green);
+            color: #000;
+        }
+        .tag-con {
+            background: var(--stripe-red);
+            color: #fff;
+        }
+
+        .wide-concept-img {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            background: #08080c;
+            display: block;
+        }
+        .concept-img-standard {
+            width: 100%;
+            height: auto;
+            max-height: 352px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            background: #08080c;
+            display: block;
+        }
+
+        .compare-duo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .compare-card {
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+        }
+        .compare-card img {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            background: #08080c;
+            border: 1px solid var(--border);
+        }
+
+        .hero-view-3d {
+            margin-top: 40px;
+            text-align: center;
+            background: #000;
+            border: 1px solid var(--accent);
+            padding: 30px;
+        }
+
+        .fade-light {
+            filter: brightness(0.18);
+            opacity: 1;
+            transition: filter 1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+            will-change: filter;
+        }
+        .fade-light.active-light {
+            filter: brightness(1);
+            opacity: 1;
+        }
+
+        .text-reveal {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .text-reveal.active-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ===== 全宽水平滚动流程区域 ===== */
+        .process-flow-fullwidth {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            position: relative;
+            margin-top: 0;
+            margin-bottom: 60px;
+            background: #040408;
+            border-top: 2px solid var(--accent);
+            border-bottom: 2px solid var(--accent);
+            overflow: hidden;
+            height: 700px;
+            z-index: 5;
+        }
+        .process-flow-sticky-wrapper {
+            position: sticky;
+            top: 90px;
+            width: 100%;
+            height: auto;
+            padding: 20px 0 16px 0;
+            z-index: 4;
+            pointer-events: none;
+        }
+        .process-flow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px 10px 40px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            max-width: 1400px;
+            margin: 0 auto;
+            pointer-events: none;
+        }
+        .process-flow-viewport {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        .process-flow-track {
+            display: flex;
+            gap: 18px;
+            padding: 0 40px;
+            will-change: transform;
+            transition: none;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+        }
+
+        /* 步骤项容器 */
+        .process-step-item {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        .process-step-item img {
+            height: 380px;
+            width: auto;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            background: #0a0a0f;
+            flex-shrink: 0;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            pointer-events: auto;
+            cursor: pointer;
+            display: block;
+        }
+        .process-step-item img:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 95, 31, 0.35);
+        }
+
+        /* 步骤标签 */
+        .process-step-label {
+            margin-top: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: #ccc;
+            text-align: center;
+            letter-spacing: 1px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto;
+            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+        }
+        .step-num {
+            color: #000;
+            background: var(--accent);
+            padding: 2px 8px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            font-size: 9px;
+        }
+        .step-desc {
+            color: #fff;
+        }
+        .process-step-item:hover .process-step-label {
+            border-color: var(--accent);
+            background: rgba(10, 10, 15, 0.95);
+        }
+        .process-step-item:hover .step-num {
+            background: #fff;
+            color: #000;
+        }
+
+        @media (max-width: 900px) {
+            .nav-grid {
+                grid-template-columns: repeat(2, 1fr);
+                margin-top: 20px;
+            }
+            .hero {
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 40px;
+                height: auto;
+                padding-top: 140px;
+                padding-bottom: 60px;
+            }
+            .terminal-window {
+                width: 100%;
+            }
+            .dossier-grid,
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+            .sub-images {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: 1fr;
+            }
+            .iterations-row {
+                grid-template-columns: 1fr !important;
+            }
+            .wide-concept-img {
+                max-height: 120px;
+            }
+            .concept-img-standard {
+                max-height: 220px;
+            }
+            .compare-duo {
+                grid-template-columns: 1fr;
+            }
+            .hero-view-3d img {
+                max-height: 400px;
+            }
+            .process-flow-fullwidth {
+                height: 480px;
+            }
+            .process-flow-sticky-wrapper {
+                top: 60px;
+                padding: 12px 0 10px 0;
+            }
+            .process-step-item img {
+                height: 220px;
+            }
+            .process-flow-header {
+                padding: 0 20px 8px 20px;
+                font-size: 10px;
+            }
+            .process-flow-track {
+                padding: 0 20px;
+                gap: 12px;
+            }
+            .process-step-label {
+                font-size: 8px;
+                padding: 4px 10px;
+                gap: 5px;
+                margin-top: 7px;
+            }
+            .step-num {
+                font-size: 7px;
+                padding: 2px 6px;
+            }
+        }
+
+        .iterations-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .variable-chip {
+            display: inline-block;
+            background: #16161c;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #ffffff;
+            margin: 4px 6px 4px 0;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .variable-chip:hover {
+            border-color: var(--accent);
+            background: #1c1c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <canvas id="neural-canvas"></canvas>
+    <div class="cinematic-bars"></div>
+
+    <nav>
+        <div class="nav-inner">
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <div class="tri-color-row" style="width: 35px;">
+                    <div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div>
+                </div>
+                <span>R2S // 个人站点_v5.5</span>
+            </div>
+            <div>系统状态: <span style="color:var(--terminal-green); font-weight: bold;">在线</span> // <span id="clock">00:00:00</span></div>
+        </div>
+        <div class="nasa-tape" style="height: 4px;"></div>
+    </nav>
+
+    <div class="container">
+        <header class="hero">
+            <div class="hero-text reveal active">
+                <div class="hero-data-tag">档案文件 // 复古未来朋克</div>
+                <div class="hero-title-wrapper">
+                    <div class="tri-color-bar">
+                        <div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div>
+                    </div>
+                    <div>
+                        <h1>功能<br><span style="color:var(--accent); display: block; margin-top: -5px;">美学</span></h1>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 35px;">
+                    <div class="barcode"></div>
+                    <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); font-weight: bold;">[ 卡带·A面 // 已载入 ]</div>
+                </div>
+                <p style="max-width: 540px; color: #ffffff; margin-top: 35px; font-size: 1.1rem; border-left: 3px solid var(--accent); padding-left: 20px; font-weight: 500;">
+                    融技艺与美学于一炉，以艺术直觉为帆，以研究思维为锚。所求者，视觉之雅必植根于技术之严谨与实践之精微。
+                </p>
+            </div>
+
+            <div class="terminal-window chamfer-box reveal active">
+                <div class="terminal-inner" id="terminal-content">
+                    <div style="border-bottom: 1px dashed var(--border); padding-bottom: 10px; margin-bottom: 10px; color: #ffffff; font-weight: bold;">
+                        系统引导 // 内核核心_v5.5<br>
+                        数据卡组: [磁带已优化]
+                    </div>
+                    &gt; 清晰字体渲染... 已稳定。<br>
+                    &gt; 雷达网格矢量密度... 已最大化。<br>
+                    &gt; 对比度修正... 已完成。<br>
+                    <span class="cursor"></span>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-grid reveal active">
+            <a href="#about" class="nav-card chamfer-box">
+                <span>01</span><span>关于我</span>
+                <div class="tri-color-row" style="width: 40px; margin: 0 auto;"><div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div></div>
+            </a>
+            <a href="#projects" class="nav-card chamfer-box">
+                <span>02</span><span>DIY项目</span>
+                <div class="tri-color-row" style="width: 40px; margin: 0 auto;"><div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div></div>
+            </a>
+            <a href="#artworks" class="nav-card chamfer-box">
+                <span>03</span><span>艺术作品</span>
+                <div class="tri-color-row" style="width: 40px; margin: 0 auto;"><div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div></div>
+            </a>
+            <a href="#contact" class="nav-card chamfer-box">
+                <span>04</span><span>联系</span>
+                <div class="tri-color-row" style="width: 40px; margin: 0 auto;"><div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div></div>
+            </a>
+        </div>
+
+        <section id="about" class="detail-section reveal" style="padding-bottom: 100px;">
+            <div class="section-header" style="margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--border); padding-bottom: 20px;">
+                <h2 style="font-size: 3.5rem; text-transform: uppercase; font-weight: 900; line-height: 1; color: #fff;">// 人员<br><span style="color: var(--accent);">档案</span></h2>
+                <div class="barcode" style="height: 50px; width: 160px;"></div>
+            </div>
+
+            <div class="dossier-grid">
+                <div>
+                    <p style="font-size: 1.2rem; line-height: 1.7; margin-bottom: 30px; background: #111115; padding: 25px; border-left: 4px solid #ffffff; color: #ffffff; font-weight: 500;">
+                        在下乃工业产品设计师兼数字艺术家，现居鹿特丹。少时以绘制角色与道具起于网络，旋即渴望实物在手。此好奇心驱我坠入3D打印与工业制造之深潭。而今，吾日以继夜，将狂野数字概念铸为可触可用的现实之物。
+                    </p>
+
+                    <div class="tech-box chamfer-box">
+                        <h4 style="color: #ffffff;"><span>核心能力</span> <span class="sec-tag">[ 甲部 ]</span></h4>
+                        <div style="font-size: 16px; margin-bottom: 25px; line-height: 2; font-family: var(--font-mono); color: #ffffff;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <div style="width: 10px; height: 10px; background: var(--stripe-red);"></div> <strong style="color: #ffffff;">三维建模与打印</strong>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <div style="width: 10px; height: 10px; background: var(--stripe-teal);"></div> <strong style="color: #ffffff;">原型制作与测试</strong>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 10px; height: 10px; background: var(--stripe-yellow);"></div> <strong style="color: #ffffff;">草图与手绘</strong>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: #ffffff; margin-bottom: 30px; line-height: 1.6; border-top: 1px dashed var(--border); padding-top: 20px; font-weight: bold;">
+                            &gt; 端到端执行: <span style="font-weight: normal; color: #eee;">掌产品全生命周期，自用户研究、初设概念、原型测试，乃至定材溯源，皆一手包办。</span>
+                        </p>
+
+                        <h4 style="color: #ffffff;"><span>软件套件</span></h4>
+                        <div class="software-list">
+                            <span class="software-tag">SolidWorks</span>
+                            <span class="software-tag">Blender</span>
+                            <span class="software-tag">KeyShot</span>
+                            <span class="software-tag">Photoshop</span>
+                            <span class="software-tag">Clip Studio Paint</span>
+                            <span class="software-tag">DaVinci Resolve</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-box chamfer-box">
+                    <h4 style="color: #ffffff;"><span>兴趣日志</span> <span class="sec-tag">[ 乙部 ]</span></h4>
+                    <ul style="list-style: none; font-family: var(--font-mono); font-size: 14px; color: #ffffff; line-height: 2.5; font-weight: bold;">
+                        <li style="border-bottom: 1px solid var(--border); padding: 4px 0;">
+                            <span style="display: inline-block; width: 110px;">
+                                <span style="color: #000;">[</span><span style="color: #ffffff;">电气</span><span style="color: #000;">]</span>
+                            </span> 电子工程
+                        </li>
+                        <li style="border-bottom: 1px solid var(--border); padding: 4px 0;">
+                            <span style="display: inline-block; width: 110px;">
+                                <span style="color: #000;">[</span><span style="color: #ffffff;">研究</span><span style="color: #000;">]</span>
+                            </span> 材料 (ABS/ASA/PETG)
+                        </li>
+                        <li style="border-bottom: 1px solid var(--border); padding: 4px 0;">
+                            <span style="display: inline-block; width: 110px;">
+                                <span style="color: #000;">[</span><span style="color: #ffffff;">运动</span><span style="color: #000;">]</span>
+                            </span> 骑行与徒步
+                        </li>
+                        <li style="border-bottom: 1px solid var(--border); padding: 4px 0;">
+                            <span style="display: inline-block; width: 110px;">
+                                <span style="color: #000;">[</span><span style="color: #ffffff;">求知</span><span style="color: #000;">]</span>
+                            </span> 科幻小说与DIY
+                        </li>
+                    </ul>
+
+                    <div class="radar-wrapper chamfer-box">
+                        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); width: 100%; border-bottom: 1px dashed var(--border); padding-bottom: 10px; text-align: center; letter-spacing: 2px; font-weight: 900;">
+                            [ 天线阵列系统 ]
+                        </div>
+                        <div class="radar" id="radar">
+                            <div class="radar-x"></div>
+                            <div class="radar-y"></div>
+                            <div class="radar-sweep" id="radar-sweep"></div>
+                        </div>
+                        <div class="tri-color-row" style="width: 100%; margin-top: 10px;">
+                            <div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="detail-section">
+            <div class="section-header reveal" style="margin-bottom: 50px;">
+                <div class="hero-data-tag">关键层 // 制造参数</div>
+                <h2 style="font-size: 3.5rem; text-transform: uppercase; font-weight: 900;">// DIY_项目</h2>
+            </div>
+
+            <!-- PRJ_01: 模块化防弹载体 -->
+            <div class="project-detailed chamfer-box reveal">
+                <div class="nasa-tape"></div>
+                <div class="dossier-grid" style="margin-top: 25px;">
+                    <div>
+                        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+                            <h4 style="color: #000; font-family: var(--font-mono); background: var(--accent); padding: 4px 12px; font-weight: bold; font-size: 11px;">项目_01</h4>
+                            <h4 style="color: #ffffff; font-family: var(--font-mono); font-size: 12px; font-weight: bold; background: #222; padding: 2px 8px;">战术纺织实验室</h4>
+                        </div>
+                        <h3 style="font-size: 2.8rem; margin: 0 0 20px 0; line-height: 1; color: #fff;">模块化<br>防弹载体</h3>
+                        <p style="color: #ffffff; margin-bottom: 25px; font-size: 1.1rem; border-left: 3px solid var(--accent); padding-left: 15px;">
+                            为解重型战术装备之真谛，吾亲手缝制模块化背心。非徒求其形酷，更习得缝纫之术、纸样之绘、材料之性及其层叠之序，兼通坚韧复合材之道。
+                        </p>
+                        <div style="font-size: 1rem; line-height: 1.8; background: #000000; padding: 20px; border: 1px solid var(--border); color: #fff;">
+                            <strong style="color: var(--accent); font-family: var(--font-mono); font-size: 12px;">&gt; 流程聚焦:</strong><br>
+                            1. <strong>打版:</strong> 绘制并裁剪贴合身形的平面纸样。<br>
+                            2. <strong>选材:</strong> 搜寻耐磨尼龙与合用之五金件。<br>
+                            3. <strong>建构:</strong> 研习穿透凯夫拉与泡沫厚层之缝纫技法。<br>
+                            4. <strong>模块化:</strong> 搭建标准MOLLE织带系统，以便附包快挂。
+                        </div>
+                    </div>
+                    <div>
+                        <div class="tech-box" style="padding: 30px; background: #000000; border-left-color: var(--stripe-teal);">
+                            <div class="spec-sheet-title">核心规格表</div>
+                            <table class="materials-table">
+                                <tbody>
+                                    <tr><td>载体</td><td>1000D 牛津尼龙</td></tr>
+                                    <tr><td>软质装甲</td><td>层压芳纶复合材料</td></tr>
+                                    <tr><td>硬质装甲</td><td>8mm 合金板</td></tr>
+                                    <tr><td>缓冲垫</td><td>10mm 通风PU泡沫</td></tr>
+                                    <tr><td>人体工学</td><td>3D 微网眼导气槽</td></tr>
+                                </tbody>
+                            </table>
+                            <div style="font-family: var(--font-mono); font-size: 12px; color: #ffffff; margin-top: 25px; background: #14141a; padding: 12px; border-left: 3px solid var(--stripe-teal); display: flex; justify-content: space-between; font-weight: bold;">
+                                <span>&gt; 校准厚度:</span> <span style="color: var(--stripe-teal); font-weight: bold;">40.00 毫米</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-gallery">
+                    <div style="position: relative; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);">
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%201.jpeg" alt="装甲主视图" class="main-gallery-img">
+                        <div style="position: absolute; top: 12px; left: 12px; background: #000; color: var(--accent); font-family: var(--font-mono); font-size: 10px; padding: 4px 10px; border: 1px solid var(--accent); font-weight: bold;">甲板摄像_A</div>
+                    </div>
+                    <div class="sub-images">
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%202.jpeg" alt="过程细节1" class="gallery-img img-frame">
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%204.jpeg" alt="过程细节2" class="gallery-img img-frame">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRJ_02: CMF 光扩散测试平台 -->
+            <div class="project-detailed chamfer-box reveal" style="border-left: 4px solid var(--accent); margin-bottom: 30px;">
+                <div class="nasa-tape" style="background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 15px, #000 15px, #000 30px); border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent);"></div>
+
+                <div style="margin-top: 25px;">
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+                        <h4 style="color: #000; font-family: var(--font-mono); background: var(--accent); padding: 4px 12px; font-weight: bold; font-size: 11px;">项目_02</h4>
+                        <h4 style="color: #ffffff; font-family: var(--font-mono); font-size: 12px; font-weight: bold; background: #222; padding: 2px 8px;">CMF散射实验室</h4>
+                        <h4 style="color: var(--accent); font-family: var(--font-mono); font-size: 11px; font-weight: bold; background: #000; padding: 2px 10px; border: 1px solid var(--accent);">[ 自动化 ]</h4>
+                    </div>
+
+                    <h3 style="font-size: 2.8rem; margin: 0 0 15px 0; line-height: 1; color: #fff;">光扩散<br>测试平台</span></h3>
+
+                    <p style="color: #ffffff; margin-bottom: 25px; font-size: 1.1rem; border-left: 3px solid var(--accent); padding-left: 15px; max-width: 800px;">
+                        吾设计并建造一光扩散测试平台，于受控光照下系统评估各材料与表面处理之视觉表现。此平台支持产品开发前期之<strong>CMF决策</strong>，重在观测材料于光透、扩散、反射与亮度分布之特性。
+                    </p>
+                </div>
+
+                <div class="dossier-grid" style="margin-top: 10px;">
+                    <div>
+                        <div class="tech-box" style="padding: 30px; background: #000000; border-left-color: var(--accent);">
+                            <div class="spec-sheet-title" style="color: var(--accent);">测试材料矩阵</div>
+                            <table class="materials-table">
+                                <tbody>
+                                    <tr><td>材料 01</td><td>半透明3D打印PLA</td></tr>
+                                    <tr><td>材料 02</td><td>半透明3D打印PETG</td></tr>
+                                    <tr><td>材料 03</td><td>亚克力板</td></tr>
+                                    <tr><td>材料 04</td><td>AB环氧树脂板</td></tr>
+                                    <tr><td>材料 05</td><td>PC光扩散板</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tech-box" style="padding: 30px; background: #000000; border-left-color: var(--stripe-yellow); margin-top: 20px;">
+                            <h4 style="color: #ffffff;"><span>可控变量</span> <span class="sec-tag" style="background: var(--stripe-yellow); color: #000 !important;">[ 参数 ]</span></h4>
+                            <div style="margin-top: 16px;">
+                                <span class="variable-chip">光强度</span>
+                                <span class="variable-chip">材料类型</span>
+                                <span class="variable-chip">材料颜色</span>
+                                <span class="variable-chip">材料厚度</span>
+                                <span class="variable-chip">表面处理</span>
+                                <span class="variable-chip">扩散距离</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="tech-box" style="padding: 25px; background: #000000; border-left-color: var(--accent);">
+                            <h4 style="color: #ffffff;"><span>概念设计</span> <span class="sec-tag">[ 总览 ]</span></h4>
+                            <p style="font-family: var(--font-mono); font-size: 11px; color: #aaa; margin-bottom: 16px; text-transform: uppercase;">&gt; 平台架构渲染图</p>
+                            <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%206.png" alt="概念设计" class="concept-img-standard img-frame" style="max-height:300px; width:100%;" loading="lazy">
+                            <div style="font-family: var(--font-mono); font-size: 10px; color: var(--accent); margin-top: 10px; text-align: right; font-weight: bold;">[ 图_A // 754×352 px ]</div>
+                        </div>
+
+                        <div style="background: #0d0d14; border: 1px solid var(--border); padding: 22px; margin-top: 20px; font-family: var(--font-mono); font-size: 12px; color: #fff; line-height: 1.8;">
+                            <strong style="color: var(--stripe-yellow); font-size: 13px;">&gt; 关键修复日志:</strong><br>
+                            <span style="color: #ccc;">经计算，铜箔胶带无法安全承载<strong style="color: var(--stripe-red);">2A电流</strong>。故更换为<strong style="color: var(--terminal-green);">无氧铜导线</strong>，截面积至少<strong>0.5 mm²</strong>。</span><br><br>
+                            <span style="color: #ccc;">另，测试面板框架<strong>喷涂黑色</strong>，以尽可能吸收环境光，降低材料间接反射之干扰。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 35px; background: #08080c; border: 1px solid var(--border); padding: 15px;">
+                    <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 12px; display: flex; justify-content: space-between;">
+                        <span>&gt; 迭代对比图 // V1 → V2 → V3</span>
+                        <span style="color: #fff; font-weight: bold;">[ 图_B // 1233×200 px ]</span>
+                    </div>
+                    <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%205.png" alt="迭代" class="wide-concept-img" loading="lazy">
+                </div>
+
+                <div class="iterations-row">
+                        <div class="iteration-card chamfer-box" style="border-left: 3px solid var(--stripe-red);">
+                        <span class="iter-badge v1">迭代_V1</span>
+                        <p style="font-family: var(--font-mono); font-size: 11px; color: #fff; margin-bottom: 10px; font-weight: bold;">单LED // 手工焊接</p>
+                        <ul>
+                            <li style="color: var(--font-mono);"><span class="tag-label tag-con">缺</span> 焊接耗时过久</li>
+                            <li style="color: var(--font-mono);"><span class="tag-label tag-con">缺</span> 光效不理想</li>
+                        </ul>
+                    </div>
+                    <div class="iteration-card chamfer-box" style="border-left: 3px solid var(--stripe-yellow);">
+                        <span class="iter-badge v2">迭代_V2</span>
+                        <p style="font-family: var(--font-mono); font-size: 11px; color: #fff; margin-bottom: 10px; font-weight: bold;">LED灯带 // 铜箔胶带</p>
+                        <ul>
+                            <li style="color: var(--font-mono);"><span class="tag-label tag-con">缺</span> 胶带不适于2A电流</li>
+                            <li style="color: var(--font-mono);"><span class="tag-label tag-con">缺</span> 无法调节亮度</li>
+                        </ul>
+                    </div>
+                    <div class="iteration-card chamfer-box" style="border-left: 3px solid var(--terminal-green);">
+                        <span class="iter-badge v3">迭代_V3</span>
+                        <p style="font-family: var(--font-mono); font-size: 11px; color: #fff; margin-bottom: 10px; font-weight: bold;">LED灯带 + PWM控制器</p>
+                        <ul>
+                            <li style="color: var(--font-mono);"><span class="tag-label tag-pro">优</span> 亮度可调</li>
+                            <li style="color: var(--font-mono);"><span class="tag-label tag-pro">优</span> 暗面发出反射光</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 最终产品立体视图 (7) + 暗亮过渡 -->
+                <div class="hero-view-3d fade-light" id="img7">
+                    <div class="text-reveal" style="font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; font-weight: bold;">&gt; 最终产品三维视图 // 主资产</div>
+                    <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%207.png" alt="测试平台三维视图" loading="lazy" style="max-width:100%; height:auto; max-height:600px;">
+                    <div style="font-family: var(--font-mono); font-size: 10px; color: #666; margin-top: 10px;">[ 图_7 // 673×699 px ]</div>
+                </div>
+
+                <!-- 8 与 9 对比 + 暗亮过渡 -->
+                <div class="compare-duo">
+                    <div class="compare-card fade-light" id="img8">
+                        <div class="text-reveal" style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-bottom: 12px; font-weight: bold;">&gt; 最终渲染 (3D)</div>
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%208.png" alt="最终模型3D" loading="lazy">
+                        <div style="font-family: var(--font-mono); font-size: 10px; color: #666; margin-top: 8px;">[ 图_8 // 540×567 px ]</div>
+                    </div>
+                    <div class="compare-card fade-light" id="img9">
+                        <div class="text-reveal" style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-bottom: 12px; font-weight: bold;">&gt; 概念草图 (2D)</div>
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%209.png" alt="概念草图2D" loading="lazy">
+                        <div style="font-family: var(--font-mono); font-size: 10px; color: #666; margin-top: 8px;">[ 图_9 // 891×855 px ]</div>
+                    </div>
+                </div>
+
+                <!-- 状态栏 -->
+                <div style="margin-top: 30px; background: #000; border: 1px solid var(--accent); padding: 20px 25px; font-family: var(--font-mono); font-size: 12px; color: #fff; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px;">
+                    <span>&gt; 平台状态: <strong style="color: var(--terminal-green);">运行中</strong></span>
+                    <span>微控制器: <strong>Arduino</strong></span>
+                    <span>驱动器: <strong>精密步进</strong></span>
+                    <span>测试能力: <strong>全向折射剖析</strong></span>
+                    <span style="color: var(--accent); font-weight: bold;">CMF就绪</span>
+                </div>
+            </div>
+            <!-- PRJ_02 橙色框结束 -->
+
+            <!-- ===== 全宽水平滚动流程区域 (10-19) - 带步骤标签 ===== -->
+            <div class="process-flow-fullwidth" id="processFlowOuter">
+                <div class="process-flow-sticky-wrapper" id="processFlowSticky">
+                    <div class="process-flow-header">
+                        <span>&gt; 制造流程 // 步骤_10 → 步骤_19</span>
+                        <span style="color: #fff;">[ 滚动平移 ]</span>
+                    </div>
+                    <div class="process-flow-viewport" id="processFlowViewport">
+                        <div class="process-flow-track" id="processTrack">
+                            <!-- 步骤 10 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2010.png" alt="过程 10">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_10</span>
+                                    <span class="step-desc">三维建模</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 11 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2011.png" alt="过程 11">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_11</span>
+                                    <span class="step-desc">激光切割</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 12 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2012.png" alt="过程 12">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_12</span>
+                                    <span class="step-desc">测试组装</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 13 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2013.png" alt="过程 13">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_13</span>
+                                    <span class="step-desc">表面处理</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 14 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2014.png" alt="过程 14">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_14</span>
+                                    <span class="step-desc">部件组装</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 15 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2015.png" alt="过程 15">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_15</span>
+                                    <span class="step-desc">电路焊接</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 16 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2016.png" alt="过程 16">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_16</span>
+                                    <span class="step-desc">电路验证</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 17 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2017.png" alt="过程 17">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_17</span>
+                                    <span class="step-desc">极性检查</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 18 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2018.png" alt="过程 18">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_18</span>
+                                    <span class="step-desc">部件组装</span>
+                                </div>
+                            </div>
+                            <!-- 步骤 19 -->
+                            <div class="process-step-item">
+                                <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2019.png" alt="过程 19">
+                                <div class="process-step-label">
+                                    <span class="step-num">步骤_19</span>
+                                    <span class="step-desc">电路测试 (观测PWM占空比)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRJ_03: 喷涂箱 V2 -->
+            <div class="dossier-grid" style="margin-top: 0;">
+                <div class="tech-box chamfer-box reveal" style="border-left-color: var(--stripe-yellow);">
+                    <h4><span style="color: #fff;">项目_03</span> <span style="color: var(--stripe-yellow); font-weight: bold;">[ 气动 ]</span></h4>
+                    <h3 style="font-size: 1.8rem; margin: 10px 0; color: #fff;">喷涂箱 V2</h3>
+                    <p style="font-size: 14px; color: #ffffff; line-height: 1.6;">工业实验室级桌面喷涂 enclosure。内置重型双正压 HEPA 及活性炭抽吸核心。</p>
+                    <div style="margin-top: 20px; font-family: var(--font-mono); font-size: 11px; color: #aaa; border-top: 1px dashed var(--border); padding-top: 15px;">
+                        <span class="variable-chip">HEPA 过滤</span>
+                        <span class="variable-chip">活性炭</span>
+                        <span class="variable-chip">正压</span>
+                    </div>
+                </div>
+                <div class="tech-box chamfer-box reveal" style="border-left-color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                    <div style="text-align: center;">
+                        <div class="tri-color-row" style="width: 140px; margin: 0 auto 15px auto;"><div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div></div>
+                        <p style="font-family: var(--font-mono); font-size: 12px; color: #fff; font-weight: bold;">&gt; 更多项目即将到来</p>
+                        <p style="font-family: var(--font-mono); font-size: 10px; color: #666; margin-top: 5px;">[ 档案扩展中 ]</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="artworks" class="detail-section reveal" style="padding-top: 80px; padding-bottom: 80px;">
+            <div class="section-header" style="margin-bottom: 50px; text-align: center;">
+                <h2 style="font-size: 3.5rem; text-transform: uppercase; font-weight: 900; color: #fff;">// 艺术作品档案</h2>
+                <div class="tri-color-row" style="width: 240px; margin: 20px auto;"><div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div></div>
+                <p style="color: #ffffff; font-family: var(--font-mono); margin-top: 10px; font-weight: bold;">&gt; 正在访问视觉资产矩阵...</p>
+            </div>
+            <div class="chamfer-box" style="background: repeating-linear-gradient(45deg, #121216, #121216 12px, #050507 12px, #050507 24px); border: 1px dashed var(--accent); padding: 80px; text-align: center;">
+                <div style="background: #000; display: inline-block; padding: 25px 45px; border: 1px solid var(--border);">
+                    <div class="hero-data-tag" style="background: var(--stripe-yellow); color: #000; border: none; font-weight: 900;">严重警告 // 缓冲区为空</div>
+                    <p style="color: #fff; font-family: var(--font-mono); margin-top: 15px; font-size: 13px; font-weight: bold;">[ 艺术作品廊全面翻新中 ]</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="detail-section reveal" style="padding-top: 40px; padding-bottom: 80px;">
+            <div class="chamfer-box" style="background: #000; border: 2px solid var(--accent); padding: 80px; text-align: center; position: relative;">
+                <div class="nasa-tape" style="position: absolute; top: 0; left: 0;"></div>
+                <div class="barcode" style="position: absolute; bottom: 20px; right: 20px; opacity: 0.3;"></div>
+                <h4 style="font-family: var(--font-mono); color: #ffffff; margin-bottom: 15px; letter-spacing: 4px; font-weight: bold; font-size: 18px;">&gt; 数据上行链路已初始化</h4>
+                <h2 style="font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; letter-spacing: -2px; color: #fff;">ranrsuika@gmail.com</h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 35px; margin-top: 40px; font-family: var(--font-mono); font-size: 18px; color: #ffffff; font-weight: bold; background: rgba(255,255,255,0.08); padding: 20px 30px; border: 1px solid var(--border);">
+                    <span class="contact-bright">位置: <span style="color:#ffffff;">鹿特丹 // 荷兰</span></span>
+                    <span class="contact-bright">加密: <span style="color:#ffffff;">SSL 安全</span></span>
+                    <span class="contact-bright">频率: <span style="color:#ffffff;">144.875 MHz</span></span>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="container footer-grid">
+                <div class="tri-color-row"><div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div></div>
+                <div style="font-size: 11px; letter-spacing: 1px; color: #fff; font-weight: bold;">RrSuika // 任务控制中心 // 2026 // 所有核心数据包已整合</div>
+                <div class="tri-color-row"><div class="s-teal"></div><div class="s-yellow"></div><div class="s-red"></div></div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            const canvas = document.getElementById('neural-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const mouse = { x: null, y: null, radius: 180 };
+
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.x;
+                mouse.y = e.y;
+            });
+            window.addEventListener('mouseout', () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+
+            function initParticles() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                particles = [];
+                const density = window.innerWidth < 900 ? 80 : 160;
+                for (let i = 0; i < density; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 0.37,
+                        vy: (Math.random() - 0.5) * 0.37,
+                        size: Math.random() * 2.2 + 1.2,
+                        color: Math.random() > 0.4 ? 'rgba(255, 95, 31, 0.9)' : 'rgba(0, 176, 255, 0.9)',
+                        phase: Math.random() * Math.PI * 2,
+                        speed: 0.013 + Math.random() * 0.02,
+                        driftVx: 0,
+                        driftVy: 0,
+                        targetDriftVx: 0,
+                        targetDriftVy: 0,
+                        driftTimer: Math.random() * 100
+                    });
+                }
+            }
+
+            let time = 0;
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                time += 0.007;
+
+                particles.forEach(p => {
+                    p.vx += Math.sin(time * 3 + p.phase) * 0.008;
+                    p.vy += Math.cos(time * 2.5 + p.phase) * 0.008;
+
+                    p.driftTimer -= 1;
+                    if (p.driftTimer <= 0) {
+                        p.targetDriftVx = (Math.random() - 0.5) * 0.2;
+                        p.targetDriftVy = (Math.random() - 0.5) * 0.2;
+                        p.driftTimer = 120 + Math.random() * 80;
+                    }
+                    p.driftVx += (p.targetDriftVx - p.driftVx) * 0.02;
+                    p.driftVy += (p.targetDriftVy - p.driftVy) * 0.02;
+                    p.vx += p.driftVx * 0.07;
+                    p.vy += p.driftVy * 0.07;
+
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const dx = p.x - mouse.x;
+                        const dy = p.y - mouse.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < mouse.radius && dist > 0.1) {
+                            const force = (1 - dist / mouse.radius) * 0.12;
+                            p.vx += (dx / dist) * force;
+                            p.vy += (dy / dist) * force;
+                        }
+                    }
+
+                    p.vx *= 0.992;
+                    p.vy *= 0.992;
+
+                    const currentSpeed = Math.sqrt(p.vx ** 2 + p.vy ** 2);
+                    if (currentSpeed < 0.15 && (mouse.x === null || mouse.y === null)) {
+                        p.vx += (Math.random() - 0.5) * 0.04;
+                        p.vy += (Math.random() - 0.5) * 0.04;
+                    }
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0) { p.x = 0;
+                        p.vx *= -0.7; }
+                    if (p.x > canvas.width) { p.x = canvas.width;
+                        p.vx *= -0.7; }
+                    if (p.y < 0) { p.y = 0;
+                        p.vy *= -0.7; }
+                    if (p.y > canvas.height) { p.y = canvas.height;
+                        p.vy *= -0.7; }
+
+                    ctx.fillStyle = p.color;
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = 6;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    particles.forEach(p2 => {
+                        const dx2 = p.x - p2.x;
+                        const dy2 = p.y - p2.y;
+                        const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+                        if (dist2 < 140) {
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${0.35 - dist2 / 500})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+            window.addEventListener('resize', initParticles);
+
+            const radarSweep = document.getElementById('radar-sweep');
+            const radarContainer = document.getElementById('radar');
+            if (radarContainer && radarSweep) {
+                const blipCount = 12;
+                let blips = [];
+                let sweepAngle = 0;
+                const sweepSpeed = (2 * Math.PI) / 6.6;
+
+                function createDynamicBlips() {
+                    radarContainer.querySelectorAll('.radar-blip').forEach(el => el.remove());
+                    blips = [];
+                    for (let i = 0; i < blipCount; i++) {
+                        const blip = document.createElement('div');
+                        blip.className = 'radar-blip';
+                        blip.style.left = '50%';
+                        blip.style.top = '50%';
+                        blip.style.opacity = '0';
+                        radarContainer.appendChild(blip);
+                        blips.push({
+                            element: blip,
+                            x: 40 + Math.random() * 20,
+                            y: 40 + Math.random() * 20,
+                            vx: (Math.random() - 0.5) * 0.8,
+                            vy: (Math.random() - 0.5) * 0.8,
+                            baseOpacity: 0
+                        });
+                    }
+                }
+
+                function updateRadar(timestamp) {
+                    sweepAngle += sweepSpeed * 0.016;
+                    if (sweepAngle > Math.PI * 2) sweepAngle -= Math.PI * 2;
+                    radarSweep.style.transform = `rotate(${sweepAngle}rad)`;
+
+                    blips.forEach(b => {
+                        b.x += b.vx;
+                        b.y += b.vy;
+                        if (b.x < 5 || b.x > 95) b.vx *= -1;
+                        if (b.y < 5 || b.y > 95) b.vy *= -1;
+                        b.x = Math.min(95, Math.max(5, b.x));
+                        b.y = Math.min(95, Math.max(5, b.y));
+
+                        b.element.style.left = b.x + '%';
+                        b.element.style.top = b.y + '%';
+
+                        const centerX = 50,
+                            centerY = 50;
+                        const dx = b.x - centerX;
+                        const dy = b.y - centerY;
+                        const angle = Math.atan2(dy, dx);
+                        let diff = Math.abs(angle - sweepAngle);
+                        if (diff > Math.PI) diff = Math.PI * 2 - diff;
+                        const threshold = 0.5;
+                        if (diff < threshold) {
+                            const intensity = 1 - diff / threshold;
+                            b.element.style.opacity = Math.min(1, intensity * 1.2);
+                            b.element.style.boxShadow = `0 0 ${8 + intensity * 14}px var(--terminal-green)`;
+                        } else {
+                            b.element.style.opacity = '0';
+                            b.element.style.boxShadow = '0 0 4px var(--terminal-green)';
+                        }
+                    });
+
+                    requestAnimationFrame(updateRadar);
+                }
+
+                createDynamicBlips();
+                requestAnimationFrame(updateRadar);
+            }
+
+            const terminal = document.getElementById('terminal-content');
+            if (terminal) {
+                const logs = [
+                    "> 冷启动: 运行正常。",
+                    "> 正在摄取鹿特丹制造数据...",
+                    "> 对比度增强: 已重新启用。",
+                    "> 日志: 所有核心样式已编译。"
+                ];
+                let line = 0;
+
+                function typeLog() {
+                    if (line < logs.length) {
+                        const p = document.createElement('div');
+                        p.textContent = logs[line];
+                        const cursor = terminal.querySelector('.cursor');
+                        terminal.insertBefore(p, cursor);
+                        line++;
+                        setTimeout(typeLog, 400);
+                    }
+                }
+                setTimeout(typeLog, 1000);
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.05 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+            function updateClock() {
+                const now = new Date();
+                const clockEl = document.getElementById('clock');
+                if (clockEl) clockEl.innerText = now.toTimeString().split(' ')[0];
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // ===== 暗亮过渡：滚动驱动亮度变化 =====
+            const fadeLightEls = document.querySelectorAll('.fade-light');
+
+            function updateFadeLightElements() {
+                const viewportHeight = window.innerHeight;
+                fadeLightEls.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    const elCenterY = rect.top + rect.height * 0.5;
+                    const progress = 1 - (elCenterY / viewportHeight);
+                    const clampedProgress = Math.max(0, Math.min(1, progress * 1.4));
+                    const brightness = 0.18 + clampedProgress * 0.82;
+                    el.style.filter = `brightness(${brightness})`;
+                    if (clampedProgress > 0.5 && !el.classList.contains('active-light')) {
+                        el.classList.add('active-light');
+                        el.querySelectorAll('.text-reveal').forEach(tr => tr.classList.add('active-text'));
+                    } else if (clampedProgress <= 0.3 && el.classList.contains('active-light')) {
+                        el.classList.remove('active-light');
+                        el.querySelectorAll('.text-reveal').forEach(tr => tr.classList.remove('active-text'));
+                    }
+                });
+            }
+
+            // ===== 水平滚动流程：滚动驱动平移 =====
+            const processFlowOuter = document.getElementById('processFlowOuter');
+            const processTrack = document.getElementById('processTrack');
+            const processFlowViewport = document.getElementById('processFlowViewport');
+            const processFlowSticky = document.getElementById('processFlowSticky');
+            let trackMaxTranslate = 0;
+            let stickyTopValue = 90;
+            let metricsNeedRecalc = true;
+
+            function getStickyTop() {
+                if (!processFlowSticky) return 90;
+                const style = getComputedStyle(processFlowSticky);
+                const topVal = parseInt(style.top, 10);
+                return isNaN(topVal) ? 90 : topVal;
+            }
+
+            function calculateTrackMetrics() {
+                if (!processTrack || !processFlowViewport) return;
+                const trackWidth = processTrack.scrollWidth;
+                const viewportWidth = processFlowViewport.clientWidth;
+                trackMaxTranslate = Math.max(0, trackWidth - viewportWidth + 30);
+                stickyTopValue = getStickyTop();
+                metricsNeedRecalc = false;
+            }
+
+            calculateTrackMetrics();
+
+            function updateHorizontalScroll() {
+                if (!processFlowOuter || !processTrack || !processFlowSticky) return;
+                if (metricsNeedRecalc) {
+                    calculateTrackMetrics();
+                }
+                if (trackMaxTranslate <= 0) {
+                    processTrack.style.transform = 'translateX(0px)';
+                    return;
+                }
+
+                const outerRect = processFlowOuter.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const stickyWrapperHeight = processFlowSticky.offsetHeight;
+
+                const isInViewport = outerRect.top < viewportHeight && outerRect.bottom > 0;
+                if (!isInViewport) return;
+
+                const stickyStart = stickyTopValue;
+                const stickyEnd = stickyTopValue + stickyWrapperHeight - outerRect.height;
+
+                if (outerRect.height <= stickyWrapperHeight) {
+                    const fallbackProgress = Math.max(0, Math.min(1,
+                        (viewportHeight - outerRect.top) / (viewportHeight + outerRect.height * 0.5)
+                    ));
+                    const translateX = -fallbackProgress * trackMaxTranslate;
+                    processTrack.style.transform = `translateX(${translateX}px)`;
+                    return;
+                }
+
+                const scrollableRange = stickyStart - stickyEnd;
+                const rawProgress = (stickyStart - outerRect.top) / scrollableRange;
+                const progress = Math.max(0, Math.min(1, rawProgress));
+
+                const translateX = -progress * trackMaxTranslate;
+                processTrack.style.transform = `translateX(${translateX}px)`;
+            }
+
+            function scrollEffectsLoop() {
+                updateFadeLightElements();
+                updateHorizontalScroll();
+                requestAnimationFrame(scrollEffectsLoop);
+            }
+
+            window.addEventListener('resize', () => {
+                metricsNeedRecalc = true;
+                calculateTrackMetrics();
+            });
+
+            window.addEventListener('load', () => {
+                metricsNeedRecalc = true;
+                calculateTrackMetrics();
+            });
+
+            setTimeout(() => {
+                metricsNeedRecalc = true;
+                calculateTrackMetrics();
+            }, 300);
+
+            setTimeout(() => {
+                metricsNeedRecalc = true;
+                calculateTrackMetrics();
+            }, 800);
+
+            requestAnimationFrame(scrollEffectsLoop);
+        })();
+    </script>
+</body>
+</html>
