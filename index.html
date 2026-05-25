@@ -409,6 +409,100 @@
             font-weight: bold;
         }
 
+        .radar-wrapper-black {
+            background: #111115 !important;
+        }
+        
+        .radar-wrapper-black::before {
+            background: #111115 !important;
+        }
+
+        .radar-console {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-top: 18px;
+        }
+
+        .radar-side {
+            min-height: 190px;
+            padding: 14px 12px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)),
+                #050505;
+            border: 1px solid #1d1d24;
+            box-shadow: inset 0 0 0 1px rgba(255,95,31,0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .nav-readout {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #cfcfcf;
+            border-bottom: 1px dotted #2a2a30;
+            padding: 7px 0;
+            letter-spacing: 1px;
+        }
+
+        .nav-readout span:first-child {
+            color: #8f8f96;
+        }
+
+        .nav-value {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .nav-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-top: 12px;
+        }
+        
+        .nav-mini-grid span {
+            height: 18px;
+            background: linear-gradient(180deg, rgba(255,95,31,0.22), rgba(255,95,31,0.06));
+            border: 1px solid rgba(255,95,31,0.18);
+        }
+        
+        .nav-mini-grid-right span {
+            background: linear-gradient(180deg, rgba(0,176,255,0.22), rgba(0,176,255,0.06));
+            border-color: rgba(0,176,255,0.18);
+        }
+        
+        .radar-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 2px;
+        }
+        
+        .radar-center .radar {
+            width: 190px;
+            height: 190px;
+        }
+        
+        @media (max-width: 900px) {
+            .radar-console {
+                grid-template-columns: 1fr;
+            }
+        
+            .radar-side {
+                min-height: auto;
+            }
+        
+            .radar-center {
+                order: 0;
+            }
+        }
         .radar-wrapper {
             margin-top: 30px;
             display: flex;
@@ -416,7 +510,7 @@
             justify-content: center;
             align-items: center;
             gap: 15px;
-            background: transparent;
+            background: #000000;
             padding: 25px;
             border: 1px solid var(--border);
         }
@@ -1065,14 +1159,36 @@
                         </li>
                     </ul>
 
-                    <div class="radar-wrapper chamfer-box">
+                    <div class="radar-wrapper chamfer-box radar-wrapper-black">
                         <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); width: 100%; border-bottom: 1px dashed var(--border); padding-bottom: 10px; text-align: center; letter-spacing: 2px; font-weight: 900;">
                             [ 天线阵列系统 ]
                         </div>
-                        <div class="radar" id="radar">
-                            <div class="radar-x"></div>
-                            <div class="radar-y"></div>
-                            <div class="radar-sweep" id="radar-sweep"></div>
+                        <div class="radar-console">
+                            <div class="radar-side radar-side-left">
+                                <div class="nav-readout"><span>HDG</span><span class="nav-value"> 274.6°</span></div>
+                                <div class="nav-readout"><span>RNG</span><span class="nav-value"> 1.8 KM</span></div>
+                                <div class="nav-readout"><span>ALT</span><span class="nav-value"> 15 KM</span></div>
+                                <div class="nav-mini-grid">
+                                    <span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                            </div>
+                            <div class="radar-center">
+                                <div class="radar" id="radar">
+                                    <div class="radar-x"></div>
+                                    <div class="radar-y"></div>
+                                    <div class="radar-sweep" id="radar-sweep"></div>
+                                </div>
+                            </div>
+                            <div class="radar-side radar-side-right">
+                                <div class="nav-readout"><span>LOCK</span><span class="nav-value">AUTO</span></div>
+                                <div class="nav-readout"><span>SIG</span><span class="nav-value">92%</span></div>
+                                <div class="nav-readout"><span>SCAN</span><span class="nav-value">ACTIVE</span></div>
+                                <div class="nav-mini-grid nav-mini-grid-right">
+                                    <span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                            </div>
                         </div>
                         <div class="tri-color-row" style="width: 100%; margin-top: 10px;">
                             <div class="s-red"></div><div class="s-yellow"></div><div class="s-teal"></div>
@@ -1081,12 +1197,6 @@
                 </div>
             </div>
         </section>
-
-        <section id="projects" class="detail-section">
-            <div class="section-header reveal" style="margin-bottom: 50px;">
-                <div class="hero-data-tag">关键层 // 制造参数</div>
-                <h2 style="font-size: 3.5rem; text-transform: uppercase; font-weight: 900;">// DIY_项目</h2>
-            </div>
 
             <!-- PRJ_01: 模块化防弹载体 -->
             <div class="project-detailed chamfer-box reveal">
