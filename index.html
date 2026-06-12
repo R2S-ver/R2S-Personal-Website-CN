@@ -808,6 +808,200 @@
             transform: translateX(0);
         }
 
+        /* ================= 横向项目展示条样式 ================= */
+        .project-showcase {
+            width: 100%;
+            height: 420px;
+            display: flex;
+            gap: 6px;
+            margin: 60px 0;
+            position: relative;
+            z-index: 10;
+        }
+        @media (max-width: 900px) {
+            .project-showcase {
+                flex-direction: column;
+                height: auto;
+                min-height: 600px;
+            }
+        }
+
+        .showcase-panel {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+            transition: flex 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            cursor: pointer;
+        }
+        .showcase-panel:hover {
+            flex: 3.5;
+        }
+        @media (max-width: 900px) {
+            .showcase-panel:hover {
+                flex: 2;
+            }
+        }
+        .showcase-panel.coming-soon {
+            cursor: default;
+        }
+
+        .showcase-bg {
+            position: absolute;
+            inset: 0;
+        }
+        .showcase-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.35) contrast(1.1);
+            transition: filter 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .showcase-panel:hover .showcase-bg img {
+            filter: brightness(0.55) contrast(1.1);
+        }
+        .showcase-bg.placeholder-bg {
+            background: repeating-linear-gradient(45deg, #1a1a22 0px, #1a1a22 20px, #0f0f15 20px, #0f0f15 40px);
+        }
+
+        .showcase-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+            z-index: 1;
+        }
+
+        .showcase-index {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            background: rgba(0,0,0,0.75);
+            padding: 3px 10px;
+            z-index: 3;
+            border: 1px solid var(--accent);
+        }
+        .showcase-spine {
+            position: absolute;
+            top: 20px;
+            right: 10px;
+            font-family: var(--font-main);
+            font-weight: 900;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            writing-mode: vertical-rl;
+            color: #fff;
+            opacity: 0.6;
+            z-index: 2;
+            transition: opacity 0.4s, transform 0.4s;
+            text-shadow: 0 0 15px rgba(0,0,0,0.6);
+        }
+        .showcase-panel:hover .showcase-spine {
+            opacity: 0;
+            transform: translateX(10px);
+        }
+        @media (max-width: 900px) {
+            .showcase-spine {
+                writing-mode: horizontal-tb;
+                top: auto;
+                bottom: 15px;
+                right: auto;
+                left: 15px;
+            }
+            .showcase-panel:hover .showcase-spine {
+                opacity: 0;
+                transform: translateX(0);
+            }
+        }
+
+        .showcase-details {
+            position: absolute;
+            bottom: 25px;
+            left: 25px;
+            right: 25px;
+            z-index: 3;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.5s 0.15s, transform 0.5s 0.15s;
+            pointer-events: none;
+        }
+        .showcase-panel:hover .showcase-details {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .showcase-category {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.65);
+            padding: 3px 8px;
+            display: inline-block;
+            margin-bottom: 5px;
+            border: 1px solid var(--accent);
+        }
+        .showcase-title {
+            font-size: clamp(1.4rem, 4vw, 2.4rem);
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .showcase-desc {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            max-width: 32ch;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+        .showcase-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 14px;
+        }
+        .showcase-tags span {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            color: #bbb;
+        }
+        .showcase-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-decoration: none;
+            border: 1px solid var(--accent);
+            padding: 5px 14px;
+            transition: background 0.3s, color 0.3s;
+            letter-spacing: 0.05em;
+        }
+        .showcase-btn:hover {
+            background: var(--accent);
+            color: #000;
+        }
+        .showcase-btn.disabled {
+            border-color: #444;
+            color: #555;
+            pointer-events: none;
+        }
+        
         /* ===== 全宽水平滚动流程区域 ===== */
         .process-flow-fullwidth {
             width: 100vw;
@@ -1211,8 +1405,87 @@
             </div>
         </section>
 
+        <section id="projects" class="detail-section">
+
+            <!-- ===== 横向项目展示条 ===== -->
+            <div class="project-showcase reveal" style="margin-top: 10px; margin-bottom: 60px;">
+                <!-- 01 模块化防弹载体 -->
+                <div class="showcase-panel" onclick="document.getElementById('prj01').scrollIntoView({behavior:'smooth'});">
+                    <div class="showcase-bg">
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%201.jpeg" alt="防弹载体" loading="eager">
+                    </div>
+                    <div class="showcase-overlay"></div>
+                    <span class="showcase-index">01 / 04</span>
+                    <span class="showcase-spine">纺织</span>
+                    <div class="showcase-details">
+                        <span class="showcase-category">特种纺织实验室</span>
+                        <h3 class="showcase-title">模块化<br>防弹载体</h3>
+                        <p class="showcase-desc">手工缝制重型战术背心，涵盖打版、凯夫拉缝制及MOLLE系统构建。</p>
+                        <div class="showcase-tags">
+                            <span>1000D 尼龙</span><span>芳纶</span><span>PU 泡沫</span><span>3D 网眼</span>
+                        </div>
+                        <span class="showcase-btn">跳转至详情</span>
+                    </div>
+                </div>
+
+                <!-- 02 光扩散测试平台 -->
+                <div class="showcase-panel" onclick="document.getElementById('prj02').scrollIntoView({behavior:'smooth'});">
+                    <div class="showcase-bg">
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%207.png" alt="光扩散平台" loading="lazy">
+                    </div>
+                    <div class="showcase-overlay"></div>
+                    <span class="showcase-index">02 / 04</span>
+                    <span class="showcase-spine">光学</span>
+                    <div class="showcase-details">
+                        <span class="showcase-category">CMF散射实验室</span>
+                        <h3 class="showcase-title">光扩散<br>测试平台</h3>
+                        <p class="showcase-desc">系统评估材料在受控光照下的透光、扩散、反射及亮度分布特性。</p>
+                        <div class="showcase-tags">
+                            <span>PLA/PETG</span><span>亚克力</span><span>PC 扩散板</span><span>PWM</span>
+                        </div>
+                        <span class="showcase-btn">跳转至详情</span>
+                    </div>
+                </div>
+
+                <!-- 03 科幻加湿器 -->
+                <div class="showcase-panel" onclick="document.getElementById('prj03').scrollIntoView({behavior:'smooth'});">
+                    <div class="showcase-bg">
+                        <img src="https://raw.githubusercontent.com/R2S-ver/R2S-Personal-Website/main/assets/images/Personal%20Website%2015.png" alt="加湿器" loading="lazy">
+                    </div>
+                    <div class="showcase-overlay"></div>
+                    <span class="showcase-index">03 / 04</span>
+                    <span class="showcase-spine">电气</span>
+                    <div class="showcase-details">
+                        <span class="showcase-category">防水电气设计</span>
+                        <h3 class="showcase-title">科幻<br>加湿器</h3>
+                        <p class="showcase-desc">基于《明日方舟：终末地》游戏内道具建模制作的实体超声波加湿器，兼具装饰与功能。</p>
+                        <div class="showcase-tags">
+                            <span>防水</span><span>电子振荡器</span><span>超声波</span>
+                        </div>
+                        <span class="showcase-btn">跳转至详情</span>
+                    </div>
+                </div>
+
+                <!-- 04 即将推出 -->
+                <div class="showcase-panel coming-soon">
+                    <div class="showcase-bg placeholder-bg"></div>
+                    <div class="showcase-overlay"></div>
+                    <span class="showcase-index">04 / 04</span>
+                    <span class="showcase-spine">筹备中</span>
+                    <div class="showcase-details">
+                        <span class="showcase-category">未来项目</span>
+                        <h3 class="showcase-title">项目<br>开发中</h3>
+                        <p class="showcase-desc">新的实验性制作项目正处于研发阶段，敬请期待。</p>
+                        <div class="showcase-tags">
+                            <span>保密</span><span>研发</span>
+                        </div>
+                        <span class="showcase-btn disabled">敬请期待</span>
+                    </div>
+                </div>
+            </div>
+            
             <!-- PRJ_01: 模块化防弹载体 -->
-            <div class="project-detailed chamfer-box reveal">
+            <div id="prj01" class="project-detailed chamfer-box reveal">
                 <div class="nasa-tape"></div>
                 <div class="dossier-grid" style="margin-top: 25px;">
                     <div>
@@ -1264,13 +1537,13 @@
             </div>
 
             <!-- PRJ_02: CMF 光扩散测试平台 -->
-            <div class="project-detailed chamfer-box reveal" style="border-left: 4px solid var(--accent); margin-bottom: 30px;">
+            <div id="prj02" class="project-detailed chamfer-box reveal" style="border-left: 4px solid var(--accent); margin-bottom: 30px;">
                 <div class="nasa-tape" style="background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 15px, #000 15px, #000 30px); border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent);"></div>
 
                 <div style="margin-top: 25px;">
                     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
                         <h4 style="color: #000; font-family: var(--font-mono); background: var(--accent); padding: 4px 12px; font-weight: bold; font-size: 11px;">项目_02</h4>
-                        <h4 style="color: #ffffff; font-family: var(--font-mono); font-size: 12px; font-weight: bold; background: #222; padding: 2px 8px;">CMF光学实验室</h
+                        <h4 style="color: #ffffff; font-family: var(--font-mono); font-size: 12px; font-weight: bold; background: #222; padding: 2px 8px;">CMF光学实验室</h4>
                         <h4 style="color: var(--accent); font-family: var(--font-mono); font-size: 11px; font-weight: bold; background: #000; padding: 2px 10px; border: 1px solid var(--accent);">[ 系统化 ]</h4>
                     </div>
 
@@ -1487,7 +1760,7 @@
             </div>
 
             <!-- PRJ_03: 喷涂箱 V2 -->
-            <div class="dossier-grid" style="margin-top: 0;">
+            <div id="prj03" class="dossier-grid" style="margin-top: 0;">
                 <div class="tech-box chamfer-box reveal" style="border-left-color: var(--stripe-yellow);">
                     <h4><span style="color: #fff;">项目_03</span> <span style="color: var(--stripe-yellow); font-weight: bold;">[ 气动 ]</span></h4>
                     <h3 style="font-size: 1.8rem; margin: 10px 0; color: #fff;">喷涂箱 V2</h3>
