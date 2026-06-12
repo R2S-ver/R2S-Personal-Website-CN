@@ -807,7 +807,40 @@
             opacity: 1;
             transform: translateX(0);
         }
+        
+        /* ===== 语言切换按钮闪烁效果 ===== */
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            text-decoration: none;
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            transition: background 0.2s, color 0.2s;
+            animation: lang-pulse 2s infinite;
+        }
+        .lang-switch:hover {
+            background: var(--accent);
+            color: #000;
+            animation: none;          /* 悬停时停止闪烁，避免冲突 */
+        }
 
+        @keyframes lang-pulse {
+            0%, 100% {
+                border-color: var(--border);
+                box-shadow: 0 0 0 0 rgba(255, 95, 31, 0);
+            }
+            50% {
+                border-color: var(--accent);
+                box-shadow: 0 0 10px rgba(255, 95, 31, 0.6);
+            }
+        }
+        
         /* ================= 横向项目展示条样式 ================= */
         .project-showcase {
             width: 100%;
@@ -1230,16 +1263,10 @@
             </div>
             <div style="display: flex; align-items: center; gap: 18px;">
     <a href="https://r2s-ver.github.io/R2S-Personal-Website/"
-       title="Switch to Chinese / 切换到中文"
-       style="display: flex; align-items: center; gap: 5px;
-              background: rgba(255,255,255,0.08); border: 1px solid var(--border);
-              padding: 4px 10px; text-decoration: none; color: #fff;
-              font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px;
-              transition: background 0.2s, color 0.2s;"
-       onmouseover="this.style.background='var(--accent)'; this.style.color='#000';"
-       onmouseout="this.style.background='rgba(255,255,255,0.08)'; this.style.color='#fff';">
-        🌐 ENGLISH
-    </a>
+   class="lang-switch"
+   title="Switch to Chinese / Switch to English">
+    🌐 ENGLISH
+</a>
     <div>SYS_STATUS: <span style="color:var(--terminal-green); font-weight: bold;">ONLINE</span> // <span id="clock">00:00:00</span></div>
 </div>
         </div>
